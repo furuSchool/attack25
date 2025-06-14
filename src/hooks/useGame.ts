@@ -3,12 +3,28 @@ import { GameState, PlayerId, BoardState, Player } from "@/types";
 import { calculateFlippableCells } from "@/logic/gameLogic";
 
 // 初期設定
-const BOARD_SIZE = 5; // 5x5マス
-const PLAYERS: Player[] = [
-    { id: 1, name: "Player 1", color: "bg-red-500" },
-    { id: 2, name: "Player 2", color: "bg-blue-500" },
-    { id: 3, name: "Player 3", color: "bg-yellow-500" },
+const INITIAL_BOARD_SIZE = 5;
+const INITIAL_PLAYER_COUNT = 4;
+
+// 利用可能なプレイヤーカラー
+const PLAYER_COLORS = [
+    "bg-rose-600", // ローズ
+    "bg-green-600", // グリーン
+    "bg-gray-300", // グレー
+    "bg-blue-600", // ブルー
+    "bg-purple-600", // パープル
+    "bg-orange-600", // オレンジ
+    "bg-teal-600", // ティール
+    "bg-cyan-600", // シアン
 ];
+
+const createPlayers = (count: number): Player[] => {
+    return Array.from({ length: count }, (_, i) => ({
+        id: (i + 1) as PlayerId,
+        name: `Player ${i + 1}`,
+        color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+    }));
+};
 
 // 初期盤面を生成する関数
 const createInitialBoard = (size: number): BoardState =>
@@ -18,23 +34,42 @@ const createInitialBoard = (size: number): BoardState =>
 
 // ゲームの初期状態
 const initialState: GameState = {
-    board: createInitialBoard(BOARD_SIZE),
-    players: PLAYERS,
+    boardSize: INITIAL_BOARD_SIZE,
+    board: createInitialBoard(INITIAL_BOARD_SIZE),
+    players: createPlayers(INITIAL_PLAYER_COUNT),
     isAttackChanceMode: false,
     history: [],
 };
 
 // Reducerが受け取るアクションの型
-type Action =
+export type Action =
     | { type: "PLACE_PIECE"; payload: { row: number; col: number; player: PlayerId } }
     | { type: "START_ATTACK_CHANCE" }
+    | { type: "END_ATTACK_CHANCE" }
     | { type: "SET_ATTACK_CHANCE_TARGET"; payload: { row: number; col: number } }
+    | { type: "CHANGE_SETTINGS"; payload: { boardSize?: number; playerCount?: number } }
     | { type: "UNDO" }
     | { type: "RESET" };
 
 // 状態を更新するReducer関数
 function gameReducer(state: GameState, action: Action): GameState {
     switch (action.type) {
+        case "CHANGE_SETTINGS": {
+            const newBoardSize = action.payload.boardSize ?? state.boardSize;
+            const newPlayerCount = action.payload.playerCount ?? state.players.length;
+
+            const newPlayers = createPlayers(newPlayerCount);
+            const newBoard = createInitialBoard(newBoardSize);
+
+            // 設定が変更されたらゲーム全体をリセット
+            return {
+                boardSize: newBoardSize,
+                board: newBoard,
+                players: newPlayers,
+                isAttackChanceMode: false,
+                history: [],
+            };
+        }
         case "PLACE_PIECE": {
             const { row, col, player } = action.payload;
             const newBoard = JSON.parse(JSON.stringify(state.board)); // deep copy
@@ -48,8 +83,8 @@ function gameReducer(state: GameState, action: Action): GameState {
 
                 targetCell.owner = player;
                 targetCell.isAttackChance = false;
-                flippable.forEach(cell => {
-                newBoard[cell.row][cell.col].owner = player;
+                flippable.forEach((cell) => {
+                    newBoard[cell.row][cell.col].owner = player;
                 });
 
                 return {
@@ -78,6 +113,9 @@ function gameReducer(state: GameState, action: Action): GameState {
         case "START_ATTACK_CHANCE":
             return { ...state, isAttackChanceMode: true };
 
+        case "END_ATTACK_CHANCE":
+            return { ...state, isAttackChanceMode: false };
+
         case "SET_ATTACK_CHANCE_TARGET": {
             if (!state.isAttackChanceMode) return state;
             const { row, col } = action.payload;
@@ -86,6 +124,7 @@ function gameReducer(state: GameState, action: Action): GameState {
 
             const newBoard = JSON.parse(JSON.stringify(state.board));
             newBoard[row][col].isAttackChance = true;
+            newBoard[row][col].owner = 0;
 
             return {
                 ...state,
@@ -103,8 +142,10 @@ function gameReducer(state: GameState, action: Action): GameState {
 
         case "RESET":
             return {
-                ...initialState,
-                board: createInitialBoard(BOARD_SIZE),
+                ...state,
+                board: createInitialBoard(state.boardSize),
+                isAttackChanceMode: false,
+                history: [],
             };
 
         default:

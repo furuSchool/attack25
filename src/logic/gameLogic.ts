@@ -1,4 +1,4 @@
-import { BoardState, CellOwner, PlayerId } from '@/types';
+import { BoardState, PlayerId } from '@/types';
 
 const DIRECTIONS = [
   [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1],

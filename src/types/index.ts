@@ -1,4 +1,4 @@
-export type PlayerId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10; // プレイヤーID
+export type PlayerId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // プレイヤーID
 export type CellOwner = 0 | PlayerId;
 
 // プレイヤー情報
@@ -20,6 +20,7 @@ export type BoardState = CellState[][];
 // ゲーム全体のの状態
 export interface GameState {
   board: BoardState;
+  boardSize: number;
   players: Player[];
   isAttackChanceMode: boolean; // アタックチャンス中か
   history: GameState[]; // 履歴

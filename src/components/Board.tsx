@@ -16,26 +16,29 @@ const getCellClass = (owner: number, isAttackChance: boolean, players: Player[])
 };
 
 export default function Board({ board, players, onCellClick }: Props) {
+    const boardSize = board.length;
     return (
-        <div className="grid grid-cols-5 gap-1 p-2 bg-black">
+        <div
+            // ★盤面コンテナの修正
+            className="grid w-full aspect-square gap-1 p-2 bg-black"
+            style={{ gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))` }}
+        >
             {board.map((row, rowIndex) =>
                 row.map((cell, colIndex) => {
                     const panelNumber = rowIndex * board.length + colIndex + 1;
                     return (
                         <div
                             key={`${rowIndex}-${colIndex}`}
-                            className={`w-32 h-32 flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 ${getCellClass(
+                            className={`aspect-square flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 ${getCellClass(
                                 cell.owner,
                                 cell.isAttackChance,
                                 players
                             )}`}
                             onClick={() => onCellClick(rowIndex, colIndex)}
                         >
-                            {cell.owner === 0 && (
-                                <span className="text-5xl font-bold text-black opacity-100 select-none">
-                                    {panelNumber}
-                                </span>
-                            )}
+                            <span className="text-5xl font-bold text-black opacity-100 select-none">
+                                {panelNumber}
+                            </span>
                         </div>
                     );
                 })

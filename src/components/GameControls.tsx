@@ -17,7 +17,7 @@ export default function GameControls({
     <div className="p-4 bg-white rounded-lg shadow flex flex-col gap-3">
       <div>
         <label htmlFor="player-select" className="block text-sm font-medium text-gray-700">
-          次のプレイヤー
+          パネル選択
         </label>
         <select
           id="player-select"
@@ -33,16 +33,16 @@ export default function GameControls({
 
       <button
         onClick={onAttackChance}
-        className={`w-full px-4 py-2 text-white font-bold rounded-md ${isAttackChanceMode ? 'bg-yellow-500' : 'bg-purple-600 hover:bg-purple-700'}`}
+        className={`w-full px-4 py-2 text-white font-bold rounded-md ${isAttackChanceMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-600 hover:bg-gray-700'}`}
       >
-        {isAttackChanceMode ? 'ターゲットを選択中...' : 'アタックチャンス'}
+        {isAttackChanceMode ? 'アタックチャンス中' : 'アタックチャンス'}
       </button>
 
       <div className="flex gap-2">
-        <button onClick={onUndo} className="flex-1 px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700">
-          元に戻す
+        <button onClick={onUndo} className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">
+          一つ前に戻す
         </button>
-        <button onClick={onReset} className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">
+        <button onClick={onReset} className="flex-1 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700">
           リセット
         </button>
       </div>
