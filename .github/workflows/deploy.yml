@@ -1,10 +1,11 @@
+# .github/workflows/deploy.yml
+
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
-
 
 permissions:
   contents: read
@@ -13,35 +14,31 @@ permissions:
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # 1. リポジトリのコードをチェックアウト
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Node.js環境をセットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "20"
           cache: 'npm'
 
-      # 3. 依存パッケージをインストール
       - name: Install dependencies
         run: npm install
 
-      # 4. Next.jsアプリをビルド＆エクスポート
-      # `next build` を実行すると、`next.config.js` の `output: 'export'` 設定に基づき `out` ディレクトリに静的ファイルが生成される
       - name: Build
         run: npm run build
 
-      # 5. 生成された静的ファイルをアーティファクトとしてアップロード
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
-      # 6. GitHub Pagesにデプロイ
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
