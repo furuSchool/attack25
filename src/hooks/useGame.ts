@@ -48,6 +48,7 @@ export type Action =
     | { type: "END_ATTACK_CHANCE" }
     | { type: "SET_ATTACK_CHANCE_TARGET"; payload: { row: number; col: number } }
     | { type: "CHANGE_SETTINGS"; payload: { boardSize?: number; playerCount?: number } }
+    | { type: "CHANGE_PLAYER_NAME"; payload: { playerId: PlayerId; newName: string } }
     | { type: "UNDO" }
     | { type: "RESET" };
 
@@ -68,6 +69,15 @@ function gameReducer(state: GameState, action: Action): GameState {
                 players: newPlayers,
                 isAttackChanceMode: false,
                 history: [],
+            };
+        }
+        case "CHANGE_PLAYER_NAME": {
+            const { playerId, newName } = action.payload;
+            return {
+                ...state,
+                players: state.players.map(player =>
+                    player.id === playerId ? { ...player, name: newName } : player
+                ),
             };
         }
         case "PLACE_PIECE": {

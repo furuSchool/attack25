@@ -39,7 +39,7 @@ export default function Home() {
             </div>
         </div>
         <div className="w-full md:w-80 flex-shrink-0 flex flex-col gap-4">
-            <PlayerInfo players={state.players} board={state.board} />
+            <PlayerInfo players={state.players} board={state.board} dispatch={dispatch} />
             <GameControls
                 players={state.players}
                 currentPlayerId={currentPlayerId}
